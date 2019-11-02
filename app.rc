@@ -1,0 +1,16 @@
+fn conf_enable_highscores {
+    enable_highscores=yes
+    conf_enable_app highscores
+}
+
+fn highscores_init {
+    if(! ~ $#enable_highscores 0 && ~ $req_path /) {
+        handler_body_main=(tpl_handler `{get_lib_file highscores/highscores.tpl apps/highscores/highscores.tpl})
+
+        if(~ $REQUEST_METHOD POST && ~ 1 $#post_arg_hs_name && ~ 1 $#post_arg_hs_score) {
+            score=`{echo $post_arg_hs_score | sed 's/[^0-9]//g'}
+            score=$score','`{echo $post_arg_hs_name | sed 's/[^a-zA-Z0-9]//g'}
+            echo $score >> $sitedir/_werc/scores
+        }
+    }
+}
